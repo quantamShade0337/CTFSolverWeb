@@ -1,0 +1,4 @@
+[
+  { "date": "2026-06-02", "macrostructure": "Workbench", "theme": "Vercel-mono", "theme_axes": "dark / geometric-sans / neutral", "enrichment": "none", "brief": "ctfsolver · Vercel-themed monochrome redesign, no gradients" },
+  { "date": "2026-06-02", "macrostructure": "Workbench", "theme": "custom (Phosphor)", "theme_axes": "dark / mono / chromatic-green-140", "enrichment": "none", "brief": "ctfsolver · CTF triage playbooks, routed multi-page" }
+]
