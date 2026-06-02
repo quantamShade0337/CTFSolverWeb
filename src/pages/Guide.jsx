@@ -4,8 +4,10 @@ import {
   Check,
   ChevronRight,
   Copy,
+  Lightbulb,
   ListChecks,
   Package,
+  Target,
   Terminal,
 } from "lucide-react";
 import { CommandBlock } from "../components/CommandBlock.jsx";
@@ -18,6 +20,13 @@ import {
   relatedGuides,
 } from "../lib.js";
 import { NotFound } from "./NotFound.jsx";
+
+/* Wrap `inline code` spans in <code>. */
+function fmt(text) {
+  return text
+    .split(/`([^`]+)`/g)
+    .map((seg, i) => (i % 2 ? <code key={i}>{seg}</code> : seg));
+}
 
 export function Guide() {
   const { id } = useParams();
@@ -51,6 +60,20 @@ export function Guide() {
             <p className="guide-symptom">{guide.symptoms}</p>
           </header>
 
+          {guide.explain && (
+            <section className="doc-block">
+              <div className="doc-head">
+                <Lightbulb size={16} />
+                <h2>What's actually going on</h2>
+              </div>
+              <div className="explain">
+                {guide.explain.split("\n\n").map((para, i) => (
+                  <p key={i}>{fmt(para)}</p>
+                ))}
+              </div>
+            </section>
+          )}
+
           <section className="doc-block">
             <div className="doc-head">
               <Terminal size={16} />
@@ -71,6 +94,23 @@ export function Guide() {
               ))}
             </div>
           </section>
+
+          {guide.apply && guide.apply.length > 0 && (
+            <section className="doc-block">
+              <div className="doc-head">
+                <Target size={16} />
+                <h2>How to apply it to your challenge</h2>
+              </div>
+              <ol className="apply">
+                {guide.apply.map((step, i) => (
+                  <li key={i}>
+                    <span className="apply-num">{i + 1}</span>
+                    <span>{fmt(step)}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
 
           <section className="doc-block">
             <div className="doc-head">

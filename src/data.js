@@ -1,4 +1,5 @@
 import { expandedGuides } from "./expandedGuides.js";
+import { guideDetails } from "./details.js";
 
 export const categories = [
   "Forensics",
@@ -717,6 +718,16 @@ guides.push(
 );
 
 guides.push(...expandedGuides);
+
+/* Attach explanation + how-to-apply. Hand-authored detail (guideDetails) wins;
+   expanded guides already carry recipe-level detail from expandedGuides.js. */
+for (const guide of guides) {
+  const detail = guideDetails[guide.id];
+  if (detail) {
+    guide.explain = detail.explain;
+    guide.apply = detail.apply;
+  }
+}
 
 export const quickChecks = [
   { label: "Identify file", command: "file <target> && xxd -l 64 <target>" },
