@@ -1,61 +1,38 @@
-/* Hallmark · macrostructure: Workbench (app shell) · tone: utilitarian · anchor hue: none (monochrome)
- * theme: Vercel-inspired — pure-black canvas, near-white ink, hairline borders, Geist type.
- * Decoration is restraint: no gradients, no glows. White is the only action color.
- * Tokens trace to DESIGN.md (Vercel). pre-emit critique: P5 H5 E5 S5 R5 V4
- */
-
 :root {
   color-scheme: dark;
 
-  /* ---- surfaces (Vercel dark gray scale) ---- */
   --bg: #000000;
   --surface: #0a0a0a;
   --surface-2: #111111;
   --surface-3: #181818;
   --inset: #0a0a0a;
 
-  /* ---- ink ---- */
   --text: #ededed;
   --text-2: #a1a1a1;
   --muted: #8f8f8f;
   --faint: #6b6b6b;
 
-  /* ---- hairlines ---- */
   --border: #1f1f1f;
   --border-soft: #161616;
   --border-strong: #2e2e2e;
 
-  /* ---- action (monochrome — white is the CTA) ---- */
   --action: #ededed;
   --action-hover: #ffffff;
   --on-action: #000000;
 
-  /* ---- the one allowed accent: link/info blue, used sparingly ---- */
   --link: #3291ff;
   --focus: #52a8ff;
 
-  /* ---- status (kept muted; from DESIGN.md) ---- */
   --warn: #f5a623;
   --danger: #ee4444;
 
-  /* category wayfinding stays monochrome — tone resolves to ink */
   --tone: var(--text);
 
-  /* ---- type (Geist) ---- */
   --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
   --sans: "Geist", "Inter", system-ui, -apple-system, "Helvetica Neue", sans-serif;
 
-  --text-xs: 0.75rem;     /* 12 */
-  --text-sm: 0.875rem;    /* 14 */
-  --text-base: 1rem;      /* 16 */
-  --text-md: 1.125rem;    /* 18 */
-  --text-lg: 1.25rem;     /* 20 */
-  --text-xl: 1.5rem;      /* 24 */
-  --text-2xl: 2rem;       /* 32 */
-  --text-3xl: 3rem;       /* 48 */
-  --text-display: clamp(2.5rem, 6vw, 4.25rem);
+  --text-xs: 0.75rem;     --text-sm: 0.875rem;    --text-base: 1rem;      --text-md: 1.125rem;    --text-lg: 1.25rem;     --text-xl: ıı1.5rem;      --text-2xl: 2rem;       --text-3xl: 3rem;       --text-display: clamp(2.5rem, 6vw, 4.25rem);
 
-  /* ---- 4pt spacing (Vercel --geist-space) ---- */
   --space-2xs: 4px;
   --space-xs: 8px;
   --space-sm: 12px;
@@ -66,13 +43,11 @@
   --space-3xl: 64px;
   --space-4xl: 96px;
 
-  /* ---- radii (--geist-radius 6, marketing 8) ---- */
   --radius-sm: 6px;
   --radius: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
 
-  /* ---- motion ---- */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -80,7 +55,6 @@
   --dur: 160ms;
   --dur-slow: 280ms;
 
-  /* ---- elevation (stacked, subtle — Vercel never single heavy drop) ---- */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 24px -8px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 1px 1px rgba(0, 0, 0, 0.4), 0 8px 16px -4px rgba(0, 0, 0, 0.5),

@@ -719,8 +719,6 @@ guides.push(
 
 guides.push(...expandedGuides);
 
-/* Attach explanation + how-to-apply. Hand-authored detail (guideDetails) wins;
-   expanded guides already carry recipe-level detail from expandedGuides.js. */
 for (const guide of guides) {
   const detail = guideDetails[guide.id];
   if (detail) {

@@ -28,7 +28,7 @@ export function Search() {
               {results.length === 1 ? "" : "s"} for “{q}”
             </>
           ) : (
-            "Type to search every playbook by title, symptom, tool, or file type."
+            "Search in plain words (“hidden in a photo”) or by tool, symptom, or file type."
           )}
         </p>
       </header>

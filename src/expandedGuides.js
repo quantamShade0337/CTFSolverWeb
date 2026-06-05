@@ -262,9 +262,6 @@ const recipes = {
   },
 };
 
-/* Concept explanation + how-to-apply steps, shared by every guide built on a recipe.
-   These describe the methodology of the whole family; the per-guide symptoms tell you
-   which family you are in. */
 const recipeDetails = {
   file: {
     explain:

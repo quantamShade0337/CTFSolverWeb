@@ -1,8 +1,4 @@
-/* Per-guide explanation ("what's actually going on") + how-to-apply steps for the
-   hand-authored playbooks. Recipe-based guides get their detail from expandedGuides.js;
-   anything keyed here overrides that. Inline `code` is rendered as <code> in the UI. */
 export const guideDetails = {
-  // ───────────────────────── Forensics ─────────────────────────
   "binary-digits-image": {
     explain:
       "A computer file is just bytes, and a byte is 8 bits. When a challenge hands you a text file containing nothing but `0` and `1`, those characters are a written-out representation of the bits of some real file. Group them into bytes, and the first few bytes (the magic number) tell you what the hidden file actually is — often an image whose flag you have to *see*, not `grep`.",
@@ -173,8 +169,6 @@ export const guideDetails = {
       "Grep the whole profile recursively for flag patterns as a quick pass.",
     ],
   },
-
-  // ───────────────────────── Web ─────────────────────────
   "sql-injection": {
     explain:
       "When an app builds a SQL query by concatenating your input, a quote or SQL keyword can change the query's meaning — letting you bypass logins, read other rows, or dump tables. The first probe is a single quote: if it causes an error or a behaviour change, the parameter is injectable.",
@@ -295,8 +289,6 @@ export const guideDetails = {
       "Note that source maps reveal frontend source but rarely backend secrets.",
     ],
   },
-
-  // ───────────────────────── Cryptography ─────────────────────────
   "classic-ciphers": {
     explain:
       "Letters-only ciphertext with a wordplay-ish or historical theme is usually a classical cipher — Caesar/ROT (a fixed shift), Atbash (alphabet reversed), or Vigenère (a keyword shift). These are cheap to brute-force or solve before reaching for modern crypto.",
@@ -377,8 +369,6 @@ export const guideDetails = {
       "If it uses `secrets`/`os.urandom`, this won't work — it's cryptographically secure.",
     ],
   },
-
-  // ───────────────────────── Binary Exploit ─────────────────────────
   ret2win: {
     explain:
       "The simplest overflow: the binary already contains a function (`win`, `print_flag`, `give_shell`) that does what you want, and an unsafe input lets you overwrite the saved return address. You just redirect execution to that function's address.",
@@ -419,8 +409,6 @@ export const guideDetails = {
       "Mind the glibc version — safe-linking (2.32+) changes how the fd pointer is mangled.",
     ],
   },
-
-  // ───────────────────────── Reverse Engineering ─────────────────────────
   "strings-password": {
     explain:
       "Many beginner crackmes compare your input against a literal string stored in the binary. The fastest path is static: dump the strings and look for the password, or trace the comparison call to see what it expects.",
@@ -471,8 +459,6 @@ export const guideDetails = {
       "Remember the JS wrapper may transform your input before it reaches the WASM.",
     ],
   },
-
-  // ───────────────────────── Network ─────────────────────────
   "http-pcap": {
     explain:
       "HTTP traffic in a capture is largely plaintext: requests, responses, headers, cookies, form posts, and downloaded files. Following the HTTP streams and carving transferred files usually surfaces the flag directly.",
@@ -513,8 +499,6 @@ export const guideDetails = {
       "For FTP, remember data transfers use a separate stream from the control channel.",
     ],
   },
-
-  // ───────────────────────── Logs ─────────────────────────
   "ssh-auth-log": {
     explain:
       "Linux auth logs record every login attempt. A brute-force shows as many `Failed password` lines from one IP, eventually followed by an `Accepted password`. The story is: which IP, which account, when it succeeded, and what happened next.",
@@ -535,8 +519,6 @@ export const guideDetails = {
       "Reconstruct the ordered sequence of the attacker's requests to find the payoff.",
     ],
   },
-
-  // ───────────────────────── General Skills ─────────────────────────
   "base-encoding": {
     explain:
       "Encodings (base64, hex, URL-encoding, HTML entities) are reversible representations, not encryption, and challenges often stack them. The discipline is decoding one layer at a time and checking whether the result is yet another encoding.",
@@ -567,8 +549,6 @@ export const guideDetails = {
       "Recover unreachable objects with `git fsck --lost-found`, then `git show` them.",
     ],
   },
-
-  // ───────────────────────── General Skills (mini) ─────────────────────────
   "zero-width": {
     explain:
       "Zero-width Unicode characters (U+200B, U+200C, U+FEFF, etc.) render as nothing but are real bytes in the file. Authors use them to encode bits or hide delimiters in otherwise-normal text — the giveaway is text whose copied length is larger than it looks.",
@@ -609,8 +589,6 @@ export const guideDetails = {
       "Cross-check with `strings` for readable fragments.",
     ],
   },
-
-  // ───────────────────────── Forensics (mini) ─────────────────────────
   "bmp-padding": {
     explain:
       "BMP pixel rows are padded so each row's length is a multiple of 4 bytes. Those padding bytes are ignored by viewers, making them a quiet place to hide data based on the image width and colour depth.",
@@ -671,8 +649,6 @@ export const guideDetails = {
       "Grep the raw DB file with `strings` for deleted text the engine no longer indexes.",
     ],
   },
-
-  // ───────────────────────── Web (mini) ─────────────────────────
   "xss-admin-bot": {
     explain:
       "When your input is rendered on a page that a bot/admin visits, stored or reflected XSS lets your script run in their session. You confirm script execution, then read accessible page state or send data to an allowed callback.",
@@ -753,8 +729,6 @@ export const guideDetails = {
       "Use the captured credential to access the protected account.",
     ],
   },
-
-  // ───────────────────────── Cryptography (mini) ─────────────────────────
   "aes-ecb": {
     explain:
       "ECB mode encrypts each 16-byte block independently, so identical plaintext blocks produce identical ciphertext blocks. That repetition leaks structure (the famous 'ECB penguin') and enables byte-at-a-time decryption when you can prepend chosen plaintext.",
@@ -815,8 +789,6 @@ export const guideDetails = {
       "Convert the secret integer to bytes if it's a flag string.",
     ],
   },
-
-  // ───────────────────────── Binary Exploit (mini) ─────────────────────────
   srop: {
     explain:
       "Sigreturn-Oriented Programming abuses the `sigreturn` syscall, which restores all registers from a frame on the stack. If you can call `sigreturn` and control the stack, you set every register at once — powerful when normal ROP gadgets are scarce.",
@@ -857,8 +829,6 @@ export const guideDetails = {
       "Adjust syscalls to whatever the filter actually permits.",
     ],
   },
-
-  // ───────────────────────── Reverse Engineering (mini) ─────────────────────────
   "angr-constraints": {
     explain:
       "When a checker is pure logic — lots of arithmetic/bitwise constraints on the input — symbolic execution can solve it for you. angr explores paths with a symbolic input and asks a solver (Z3) for input that reaches the 'success' state.",
@@ -899,8 +869,6 @@ export const guideDetails = {
       "Read or reimplement the check.",
     ],
   },
-
-  // ───────────────────────── Network (mini) ─────────────────────────
   "irc-chat": {
     explain:
       "IRC and similar chat protocols are plaintext. A capture containing them can be reassembled into the conversation, where the flag is often just said in a message.",
@@ -941,8 +909,6 @@ export const guideDetails = {
       "If the audio hides data, run it through the spectrogram/Morse playbook.",
     ],
   },
-
-  // ───────────────────────── Logs (mini) ─────────────────────────
   "windows-events": {
     explain:
       "Windows Event Logs (.evtx) record logons, process creation, PowerShell activity, and more, each with an Event ID. Correlating IDs like 4624 (logon) and 4688 (process created) reconstructs attacker activity.",

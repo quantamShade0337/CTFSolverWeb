@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
-import { categoryMeta } from "../lib.js";
+import { categoryMeta, displayTitle } from "../lib.js";
 
-/* A guide as a self-contained card linking to its own page. */
 export function GuideCard({ guide }) {
   const meta = categoryMeta[guide.category];
+  const renamed = Boolean(guide.plain);
   return (
     <Link
       to={`/guide/${guide.id}`}
@@ -14,11 +14,12 @@ export function GuideCard({ guide }) {
       <span className="guide-card-rail" aria-hidden="true" />
       <div className="guide-card-top">
         <span className="cat-chip" data-tone={meta.tone}>
-          {guide.category}
+          {meta.friendly}
         </span>
         <span className="diff">{guide.difficulty}</span>
       </div>
-      <h3 className="guide-card-title">{guide.title}</h3>
+      <h3 className="guide-card-title">{displayTitle(guide)}</h3>
+      {renamed && <span className="tech-tag">aka {guide.title}</span>}
       <p className="guide-card-symptom">{guide.symptoms}</p>
       <span className="guide-card-go">
         Open playbook <ArrowUpRight size={15} />
@@ -27,19 +28,21 @@ export function GuideCard({ guide }) {
   );
 }
 
-/* Compact one-line variant for dense lists. */
 export function GuideRow({ guide }) {
   const meta = categoryMeta[guide.category];
   return (
     <Link to={`/guide/${guide.id}`} className="guide-row" data-tone={meta.tone}>
       <span className="guide-row-rail" aria-hidden="true" />
       <span className="guide-row-body">
-        <strong>{guide.title}</strong>
+        <strong>
+          {displayTitle(guide)}
+          {guide.plain && <span className="row-tech">{guide.title}</span>}
+        </strong>
         <small>{guide.symptoms}</small>
       </span>
       <span className="guide-row-meta">
         <span className="cat-chip ghost" data-tone={meta.tone}>
-          {guide.category}
+          {meta.friendly}
         </span>
         <em className="diff">{guide.difficulty}</em>
       </span>

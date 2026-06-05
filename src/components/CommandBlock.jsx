@@ -1,7 +1,5 @@
 import { Check, Copy } from "lucide-react";
 
-/* A copyable shell snippet. Comment lines are dimmed; the whole block copies raw.
-   No fake window chrome — just a labelled bar and the code. */
 export function CommandBlock({ command, label = "shell", copied, onCopy }) {
   const lines = command.split("\n");
   return (

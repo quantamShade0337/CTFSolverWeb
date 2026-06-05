@@ -35,7 +35,7 @@ export function Layout() {
                 className="topnav-link"
                 data-tone={categoryMeta[c].tone}
               >
-                {c}
+                {categoryMeta[c].friendly}
               </NavLink>
             ))}
           </nav>
@@ -59,13 +59,14 @@ export function Layout() {
             <span>ctfsolver</span>
           </div>
           <p className="footer-note">
-            {totalGuides} playbooks across {categories.length} categories. Built for
-            CTF players who are stuck and want the next command, not a lecture.
+            {totalGuides} step-by-step playbooks across {categories.length} kinds of
+            challenge. Made for people who are new to CTFs and just want to know
+            what to try next — in plain English.
           </p>
           <nav className="footer-cats" aria-label="All categories">
             {categories.map((c) => (
               <Link key={c} to={`/category/${categoryMeta[c].slug}`}>
-                {c}
+                {categoryMeta[c].friendly}
               </Link>
             ))}
           </nav>

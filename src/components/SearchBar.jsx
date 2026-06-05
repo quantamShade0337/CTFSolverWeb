@@ -1,9 +1,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, CornerDownLeft } from "lucide-react";
-import { searchGuides, categoryMeta } from "../lib.js";
+import { searchGuides, categoryMeta, displayTitle } from "../lib.js";
 
-/* Search input with live suggestions. variant: "hero" (large, dropdown) or "bar" (compact). */
 export function SearchBar({ variant = "hero", autoFocus = false, initial = "" }) {
   const navigate = useNavigate();
   const [value, setValue] = useState(initial);
@@ -14,8 +13,6 @@ export function SearchBar({ variant = "hero", autoFocus = false, initial = "" })
 
   const trimmed = value.trim();
   const suggestions = trimmed ? searchGuides(trimmed).slice(0, 6) : [];
-
-  // Global "/" focuses the search.
   useEffect(() => {
     if (variant !== "hero") return;
     function onKey(e) {
@@ -113,8 +110,8 @@ export function SearchBar({ variant = "hero", autoFocus = false, initial = "" })
                   }}
                 >
                   <span className="suggest-dot" data-tone={meta.tone} />
-                  <span className="suggest-title">{g.title}</span>
-                  <span className="suggest-cat">{g.category}</span>
+                  <span className="suggest-title">{displayTitle(g)}</span>
+                  <span className="suggest-cat">{meta.friendly}</span>
                 </button>
               </li>
             );

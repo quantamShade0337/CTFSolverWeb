@@ -14,6 +14,7 @@ import { CommandBlock } from "../components/CommandBlock.jsx";
 import { useCopy } from "../components/useCopy.js";
 import {
   categoryMeta,
+  displayTitle,
   getGuide,
   installHints,
   quickChecks,
@@ -21,7 +22,6 @@ import {
 } from "../lib.js";
 import { NotFound } from "./NotFound.jsx";
 
-/* Wrap `inline code` spans in <code>. */
 function fmt(text) {
   return text
     .split(/`([^`]+)`/g)
@@ -42,9 +42,9 @@ export function Guide() {
       <nav className="crumbs" aria-label="Breadcrumb">
         <Link to="/">Home</Link>
         <ChevronRight size={13} />
-        <Link to={`/category/${meta.slug}`}>{guide.category}</Link>
+        <Link to={`/category/${meta.slug}`}>{meta.friendly}</Link>
         <ChevronRight size={13} />
-        <span>{guide.title}</span>
+        <span>{displayTitle(guide)}</span>
       </nav>
 
       <div className="guide-layout">
@@ -52,12 +52,21 @@ export function Guide() {
           <header className="guide-header" data-tone={meta.tone}>
             <div className="guide-header-meta">
               <span className="cat-chip" data-tone={meta.tone}>
-                {guide.category}
+                {meta.friendly}
               </span>
               <span className="diff solid">{guide.difficulty}</span>
             </div>
-            <h1>{guide.title}</h1>
-            <p className="guide-symptom">{guide.symptoms}</p>
+            <h1>{displayTitle(guide)}</h1>
+            {guide.plain && (
+              <p className="guide-tech">
+                The proper name for this is <strong>{guide.title}</strong> — handy
+                to know when you're searching for more.
+              </p>
+            )}
+            <p className="guide-symptom">
+              <span className="guide-symptom-label">You're probably seeing:</span>{" "}
+              {guide.symptoms}
+            </p>
           </header>
 
           {guide.explain && (
@@ -115,7 +124,7 @@ export function Guide() {
           <section className="doc-block">
             <div className="doc-head">
               <ListChecks size={16} />
-              <h2>Thought process</h2>
+              <h2>How to think about it</h2>
             </div>
             <ol className="thought">
               {guide.thought.map((step, i) => (
@@ -164,24 +173,24 @@ export function Guide() {
         <aside className="guide-rail">
           {related.length > 0 && (
             <div className="rail-card">
-              <h3>More in {guide.category}</h3>
+              <h3>More like this</h3>
               <div className="rail-links">
                 {related.map((g) => (
                   <Link key={g.id} to={`/guide/${g.id}`} className="rail-link">
-                    <span>{g.title}</span>
+                    <span>{displayTitle(g)}</span>
                     <ChevronRight size={14} />
                   </Link>
                 ))}
               </div>
               <Link to={`/category/${meta.slug}`} className="rail-all">
-                All {guide.category} playbooks
+                All {meta.friendly.toLowerCase()} playbooks
               </Link>
             </div>
           )}
 
           <div className="rail-card">
             <h3>
-              <ListChecks size={14} /> Fast checks
+              <ListChecks size={14} /> First things to try
             </h3>
             <div className="rail-copies">
               {quickChecks.map((check, i) => (

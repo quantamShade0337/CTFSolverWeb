@@ -45,21 +45,24 @@ export function Category() {
       <nav className="crumbs" aria-label="Breadcrumb">
         <Link to="/">Home</Link>
         <ChevronRight size={13} />
-        <span>{category}</span>
+        <span>{meta.friendly}</span>
       </nav>
 
       <header className="cat-hero" data-tone={meta.tone}>
         <span className="cat-dot lg" data-tone={meta.tone} />
-        <h1>{category}</h1>
+        <h1>{meta.friendly}</h1>
+        <span className="cat-hero-tech">also called {meta.tech}</span>
         <p className="cat-hero-blurb">{meta.blurb}</p>
-        <p className="cat-hero-hint">{meta.hint}</p>
+        <p className="cat-hero-hint">
+          <strong>Rule of thumb:</strong> {meta.hint}
+        </p>
         <span className="cat-hero-count">{all.length} playbooks</span>
       </header>
 
       <div className="cat-controls">
         <input
           className="filter-input"
-          placeholder={`Filter ${category.toLowerCase()} playbooks`}
+          placeholder={`Filter these ${all.length} playbooks…`}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
