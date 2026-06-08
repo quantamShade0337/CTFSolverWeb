@@ -265,11 +265,11 @@ const recipes = {
 const recipeDetails = {
   file: {
     explain:
-      "A file's extension is just a label the user picked — the real type is decided by the first few bytes, called magic bytes (`FF D8 FF` = JPEG, `89 50 4E 47` = PNG, `50 4B` = ZIP, `7F 45 4C 46` = ELF). CTF authors exploit the gap between label and reality: renaming a ZIP to `.png`, appending one file after another, or hiding a payload that only `file`, `strings`, or `binwalk` will reveal.\n\nThe whole family is about refusing to trust the name and instead interrogating the bytes — identify, read the readable parts, then peel back whatever container you actually have.",
+      "A file's extension is just a label the user picked, the real type is decided by the first few bytes, called magic bytes (`FF D8 FF` = JPEG, `89 50 4E 47` = PNG, `50 4B` = ZIP, `7F 45 4C 46` = ELF). CTF authors exploit the gap between label and reality: renaming a ZIP to `.png`, appending one file after another, or hiding a payload that only `file`, `strings`, or `binwalk` will reveal.\n\nThe whole family is about refusing to trust the name and instead interrogating the bytes, identify, read the readable parts, then peel back whatever container you actually have.",
     apply: [
-      "Swap `<target>` for your real filename and run `file <target>` first — believe its answer over the extension.",
+      "Swap `<target>` for your real filename and run `file <target>` first, believe its answer over the extension.",
       "If `file` says a known type, open it the right way; if it says `data`, look at `xxd` output for a recognisable signature buried inside.",
-      "Run the `strings | grep` line — many easy challenges leave the flag in readable text you can grab in one step.",
+      "Run the `strings | grep` line, many easy challenges leave the flag in readable text you can grab in one step.",
       "If `binwalk` or `exiftool` reveals an embedded or trailing file, extract it and start this same checklist over on the new artifact.",
     ],
   },
@@ -279,7 +279,7 @@ const recipeDetails = {
     apply: [
       "List before you extract: `7z l <archive>` shows comments, sizes, and suspicious names up front.",
       "Extract into a clean folder (`-oout`) so you can `find` and `grep` the results without polluting your working directory.",
-      "After each extraction, re-run `file` on every output — nested archives are the whole point of many of these.",
+      "After each extraction, re-run `file` on every output, nested archives are the whole point of many of these.",
       "If it's password-protected, search the challenge text, filenames, and metadata for the password before cracking with `zip2john`/`john`.",
     ],
   },
@@ -287,7 +287,7 @@ const recipeDetails = {
     explain:
       "Images can hide data in many independent places: metadata fields, bytes appended after the image officially ends, the low bits of pixel colours (LSB), the alpha channel, palette ordering, or simply text rendered into the picture that `strings` will never see. Lossless formats (PNG/BMP) support bit-level stego; lossy JPEG destroys it, so JPEG challenges lean on metadata, appended data, or visual clues instead.",
     apply: [
-      "Run metadata and embedded-data checks first (`exiftool`, `binwalk`, `strings`) — they're fast and catch the easy hides.",
+      "Run metadata and embedded-data checks first (`exiftool`, `binwalk`, `strings`), they're fast and catch the easy hides.",
       "Note the format: PNG/BMP → try `zsteg` and bit-plane tools; JPEG → skip LSB and focus on metadata, appended data, and visual inspection.",
       "If the prompt mentions colours, pixels, or 'look closer', open the image large and try contrast/inversion before reaching for code.",
       "When a tool extracts a new file or you decode pixel bits into bytes, identify that output with `file` and continue from there.",
@@ -295,9 +295,9 @@ const recipeDetails = {
   },
   audio: {
     explain:
-      "Audio challenges hide information in a domain you can't hear directly. The most common trick is a spectrogram — text or a picture painted into the frequency/time plot. Others encode Morse or DTMF tones, reverse the clip, change its speed, or bury data in the least-significant bits of WAV samples.",
+      "Audio challenges hide information in a domain you can't hear directly. The most common trick is a spectrogram, text or a picture painted into the frequency/time plot. Others encode Morse or DTMF tones, reverse the clip, change its speed, or bury data in the least-significant bits of WAV samples.",
     apply: [
-      "Generate a spectrogram (`sox <file> -n spectrogram`) and open it — visual text here is the single most common audio answer.",
+      "Generate a spectrogram (`sox <file> -n spectrogram`) and open it, visual text here is the single most common audio answer.",
       "Listen for structure: steady beeps suggest Morse, phone-keypad tones suggest DTMF (`multimon-ng`).",
       "If speech or tones sound wrong, try reversing (`ffmpeg -af areverse`) or changing tempo.",
       "For a clean WAV with no obvious audio clue, treat it like LSB stego and extract the low bits of the samples.",
@@ -305,7 +305,7 @@ const recipeDetails = {
   },
   video: {
     explain:
-      "Video bundles several streams — frames, audio, subtitles, and metadata — and the clue usually lives in just one. A QR code or flag may flash for a single frame you'll never catch during playback, so the reliable move is to explode the video into individual frames and inspect them.",
+      "Video bundles several streams, frames, audio, subtitles, and metadata, and the clue usually lives in just one. A QR code or flag may flash for a single frame you'll never catch during playback, so the reliable move is to explode the video into individual frames and inspect them.",
     apply: [
       "Extract every frame with `ffmpeg -i video frames/frame_%05d.png`, then scan the folder (grep, or `zbarimg` for QR codes).",
       "Check the other streams too: `ffprobe` for stream list, `exiftool` for metadata, and look for an embedded or external subtitle track.",
@@ -315,7 +315,7 @@ const recipeDetails = {
   },
   disk: {
     explain:
-      "A disk image is a byte-for-byte copy of a filesystem (FAT/NTFS/EXT, an ISO, or a raw `.dd`). The interesting data is often deleted, hidden in slack/unallocated space, or sitting in OS artifacts. The Sleuth Kit (`mmls`, `fls`, `icat`) lets you walk partitions and recover files — including deleted ones — without mounting anything.",
+      "A disk image is a byte-for-byte copy of a filesystem (FAT/NTFS/EXT, an ISO, or a raw `.dd`). The interesting data is often deleted, hidden in slack/unallocated space, or sitting in OS artifacts. The Sleuth Kit (`mmls`, `fls`, `icat`) lets you walk partitions and recover files, including deleted ones, without mounting anything.",
     apply: [
       "`mmls disk.img` to find partitions and their sector offsets; note the offset, you'll need it for every later command.",
       "`fls -r -o <offset> disk.img` lists live and deleted entries (deleted ones are marked with `*`).",
@@ -325,9 +325,9 @@ const recipeDetails = {
   },
   memory: {
     explain:
-      "A memory (RAM) dump is a frozen snapshot of a running machine — processes, command lines, network connections, clipboard, and sometimes passwords and keys live inside it. Volatility 3 parses that structure for you, but it's huge, so you work top-down: identify the OS, list processes, then pivot to whatever the prompt hints at.",
+      "A memory (RAM) dump is a frozen snapshot of a running machine, processes, command lines, network connections, clipboard, and sometimes passwords and keys live inside it. Volatility 3 parses that structure for you, but it's huge, so you work top-down: identify the OS, list processes, then pivot to whatever the prompt hints at.",
     apply: [
-      "Identify the OS first (`windows.info` or `linux.banners`) — every later plugin depends on it.",
+      "Identify the OS first (`windows.info` or `linux.banners`), every later plugin depends on it.",
       "List processes (`pslist`) and their command lines (`cmdline`) to spot what was actually running.",
       "Match the plugin to the hint: browser → web plugins, network → `netscan`, malware → `malfind`/process dump.",
       "Run `strings | grep` over the raw dump as a fast parallel check for flags, passwords, and commands.",
@@ -337,7 +337,7 @@ const recipeDetails = {
     explain:
       "A packet capture records network traffic. Flags hide in HTTP bodies, cookies and headers, DNS query names, ICMP payloads, plaintext FTP/SMTP sessions, or files that were transferred and can be reassembled. A protocol summary tells you where the interesting traffic is before you start following individual streams.",
     apply: [
-      "Get the lay of the land with `tshark -q -z io,phs` (protocol hierarchy) — it shows which protocols are even present.",
+      "Get the lay of the land with `tshark -q -z io,phs` (protocol hierarchy), it shows which protocols are even present.",
       "Filter to the promising protocol and read it; `tcpflow` reassembles TCP conversations into files.",
       "Carve transferred files (Wireshark 'Export Objects', `foremost`) and identify them with `file`.",
       "Run `strings | grep` across the raw pcap for credentials, cookies, and flag patterns as a quick win.",
@@ -345,11 +345,11 @@ const recipeDetails = {
   },
   web: {
     explain:
-      "Web challenges reward reconnaissance before exploitation. Before attacking a parameter you map the application: its routes, parameters, cookies, response headers, and any leaked source (`robots.txt`, `.env`, `.git`, source maps). Leaked source is gold — it tells you exact routes, secrets, and where the flag lives.",
+      "Web challenges reward reconnaissance before exploitation. Before attacking a parameter you map the application: its routes, parameters, cookies, response headers, and any leaked source (`robots.txt`, `.env`, `.git`, source maps). Leaked source is gold, it tells you exact routes, secrets, and where the flag lives.",
     apply: [
       "Replace `host` with your target and curl the basics: `/`, `robots.txt`, `.env`, `.git/HEAD`, plus the response headers (`-i`).",
       "Fuzz for hidden content with `ffuf` and a wordlist to find admin paths, backups, and API routes.",
-      "Read whatever you find — comments, JS files, and source maps often reveal the intended bug class.",
+      "Read whatever you find, comments, JS files, and source maps often reveal the intended bug class.",
       "Then pick the attack the parameter invites (SQLi, LFI, SSTI, SSRF, upload, auth) and switch to that specific playbook.",
     ],
   },
@@ -360,16 +360,16 @@ const recipeDetails = {
       "Send harmless probes one at a time and compare status code, response length, errors, and reflected output against a normal request.",
       "Map the symptom to the bug: SQL error → SQLi, `49` → SSTI, file contents → LFI, command output → RCE.",
       "Once you know the interpreter, switch to that bug's dedicated playbook for the right payloads.",
-      "Keep payloads minimal and read-only on CTF infrastructure — prove the bug before doing anything heavier.",
+      "Keep payloads minimal and read-only on CTF infrastructure, prove the bug before doing anything heavier.",
     ],
   },
   crypto: {
     explain:
-      "The first job in any crypto challenge is identifying the representation: is it an encoding (base64/hex), a classical cipher, XOR, a block cipher, RSA, a weak PRNG, or a hash? The structural clues — alphabet, length, repeated blocks, given variables, reused nonces — point to the family and therefore the attack.",
+      "The first job in any crypto challenge is identifying the representation: is it an encoding (base64/hex), a classical cipher, XOR, a block cipher, RSA, a weak PRNG, or a hash? The structural clues, alphabet, length, repeated blocks, given variables, reused nonces, point to the family and therefore the attack.",
     apply: [
       "Look at the raw text: measure length and the set of characters used (`len` vs `unique`) to narrow the family.",
       "Symbols/`=`/digits → try decoding (base64, hex) first; letters only → think classical cipher; binary blob → XOR or block cipher.",
-      "If numbers like `n`, `e`, `c` or coordinate pairs are given, you're in RSA / secret-sharing territory — jump to that playbook.",
+      "If numbers like `n`, `e`, `c` or coordinate pairs are given, you're in RSA / secret-sharing territory, jump to that playbook.",
       "Decode or attack one layer, then re-examine the output; crypto challenges are usually stacked.",
     ],
   },
@@ -378,7 +378,7 @@ const recipeDetails = {
       "Textbook RSA is secure only with good parameters; CTF RSA is about the mistakes. The private key `d` follows immediately once you know `phi`, which needs the factors `p` and `q`. So the attacks are really 'how do I factor `n`, or skip factoring': leaked factors, tiny `e` with no padding, primes that are too close (Fermat), a shared prime across keys (GCD), reused messages, or a partially-leaked key.",
     apply: [
       "Parse every number the challenge gives you (`n`, `e`, `c`, and any of `p`, `q`, `phi`, `d`, `dp`, `dq`).",
-      "If `p`/`q` or `phi` is present, compute `d = e⁻¹ mod phi` and decrypt — no factoring needed.",
+      "If `p`/`q` or `phi` is present, compute `d = e⁻¹ mod phi` and decrypt, no factoring needed.",
       "Otherwise pick the attack from the giveaway: tiny `e` → e-th root; close primes → Fermat; many moduli → pairwise GCD.",
       "When stuck, throw it at `RsaCtfTool` which automates the common parameter attacks.",
     ],
@@ -387,9 +387,9 @@ const recipeDetails = {
     explain:
       "Block ciphers leak through their mode of operation, not the cipher itself. ECB encrypts identical plaintext blocks to identical ciphertext blocks, so repetition is visible. CBC can be bit-flipped (changing a ciphertext block flips controlled bits in the next plaintext block) or attacked via a padding oracle. CTR/GCM collapse to a stream cipher and break completely if a nonce is reused.",
     apply: [
-      "Split the ciphertext into 16-byte blocks and count repeats — repeated blocks scream ECB.",
+      "Split the ciphertext into 16-byte blocks and count repeats, repeated blocks scream ECB.",
       "Identify the mode from the hint (IV present → CBC; nonce/counter → CTR; tag → GCM) and pick the matching attack.",
-      "If the server returns different errors for bad padding vs bad content, you have a padding oracle — recover plaintext block by block.",
+      "If the server returns different errors for bad padding vs bad content, you have a padding oracle, recover plaintext block by block.",
       "For any reused nonce/keystream, XOR the two ciphertexts together to start recovering plaintext.",
     ],
   },
@@ -397,7 +397,7 @@ const recipeDetails = {
     explain:
       "Binary exploitation starts with reconnaissance, not payloads. `checksec` tells you which mitigations are on (canary, NX, PIE, RELRO), and that set decides which technique is even possible. Easy pwn is usually a single clear bug: a `win`/`print_flag` function to jump to (ret2win), a format string, a ret2libc, or an unsafe `gets`/`scanf`.",
     apply: [
-      "Run `checksec --file ./chall` and write down the mitigations — they rule techniques in or out.",
+      "Run `checksec --file ./chall` and write down the mitigations, they rule techniques in or out.",
       "Look for shortcuts: a `win`/`flag`/`system` symbol (`nm`/`strings`) means you may only need to redirect execution there.",
       "Find the offset to the return address with a cyclic pattern, then build the smallest payload that proves control.",
       "On 64-bit, remember stack alignment (an extra `ret` gadget) and match the right libc when calling into it.",
@@ -407,7 +407,7 @@ const recipeDetails = {
     explain:
       "Reverse engineering is about understanding what a program checks and then satisfying or bypassing it. You go from cheap to expensive: readable strings, then dynamic traces of comparison calls, then full decompilation of the validation routine. The flag is either a literal string, something the program builds at runtime, or input that satisfies a checker you can reimplement or patch.",
     apply: [
-      "Start with `strings | grep` for flags, passwords, and 'correct'/'wrong' messages — sometimes that's the whole challenge.",
+      "Start with `strings | grep` for flags, passwords, and 'correct'/'wrong' messages, sometimes that's the whole challenge.",
       "Trace dynamically (`ltrace`/`strace`) to catch `strcmp`/`memcmp` arguments without reading assembly.",
       "Decompile the validation function (Ghidra) and read what it actually compares your input against.",
       "If logic is too tangled, reimplement the check in Python or patch the conditional branch to accept any input.",
@@ -415,11 +415,11 @@ const recipeDetails = {
   },
   mobile: {
     explain:
-      "A mobile app (APK/IPA) is a ZIP-like container holding resources, config, compiled bytecode, native libraries, and local databases. Secrets hide across all of those layers — Java/Kotlin code, `assets/`, `res/`, native `.so` files, or SQLite/SharedPreferences data — so you decompile and search broadly before focusing on the code path that validates the flag.",
+      "A mobile app (APK/IPA) is a ZIP-like container holding resources, config, compiled bytecode, native libraries, and local databases. Secrets hide across all of those layers, Java/Kotlin code, `assets/`, `res/`, native `.so` files, or SQLite/SharedPreferences data, so you decompile and search broadly before focusing on the code path that validates the flag.",
     apply: [
       "Unzip/inspect the package, then decompile: `jadx` for readable Java/Kotlin, `apktool` for resources and smali.",
       "Grep the decompiled output for `flag`, `secret`, `password`, `firebase`, and API keys across every folder.",
-      "Don't forget native libs — check `.so` files with `strings` if the Java side looks clean.",
+      "Don't forget native libs, check `.so` files with `strings` if the Java side looks clean.",
       "Trace how the app reads/validates the flag and follow that path to the source or the stored secret.",
     ],
   },
@@ -427,25 +427,25 @@ const recipeDetails = {
     explain:
       "An email file (`.eml`/`.msg`) is structured text: headers that record routing and authentication (`Received`, `DKIM`, `SPF`, `From`) plus a MIME body that can carry quoted-printable or base64-encoded parts and attachments. The clue is usually a spoofed/odd header or a payload tucked inside an encoded MIME part.",
     apply: [
-      "Read the headers top to bottom — `Received` chains and `From`/`Reply-To` mismatches reveal spoofing and the real origin.",
+      "Read the headers top to bottom, `Received` chains and `From`/`Reply-To` mismatches reveal spoofing and the real origin.",
       "Extract MIME parts and attachments (`ripmime`/`munpack`) and identify each with `file`.",
-      "Decode encoded bodies (quoted-printable `=3D`, or base64) — the actual message often hides there.",
+      "Decode encoded bodies (quoted-printable `=3D`, or base64), the actual message often hides there.",
       "Follow any links or attachments as the next artifact in the chain.",
     ],
   },
   logs: {
     explain:
-      "Log challenges are needle-in-haystack timelines. The skill is summarising first — counting IPs, requests, or events — so the rare anomaly stands out against the noise, then reconstructing the sequence: initial access, privilege change, command execution, exfiltration, flag access.",
+      "Log challenges are needle-in-haystack timelines. The skill is summarising first, counting IPs, requests, or events, so the rare anomaly stands out against the noise, then reconstructing the sequence: initial access, privilege change, command execution, exfiltration, flag access.",
     apply: [
       "Skim the format with `head`, then summarise frequency (`awk '{print $1}' | sort | uniq -c | sort -nr`) to find the odd actor.",
       "Grep for the obvious markers: `Failed`/`Accepted`, `sudo`, SQL keywords, `../`, `cmd=`, `powershell`, upload/admin paths.",
-      "Pin the single successful/anomalous event after a run of failures — that's usually the pivot point.",
+      "Pin the single successful/anomalous event after a run of failures, that's usually the pivot point.",
       "Order events by timestamp (mind the timezone) to build the attacker's full story.",
     ],
   },
   git: {
     explain:
-      "A git repository remembers far more than the current files. Anything ever committed survives in history, branches, tags, stashes, the reflog, or as dangling blobs — even if it was 'deleted' or force-pushed away. Searching only the working tree is the mistake; you search all reachable (and unreachable) history.",
+      "A git repository remembers far more than the current files. Anything ever committed survives in history, branches, tags, stashes, the reflog, or as dangling blobs, even if it was 'deleted' or force-pushed away. Searching only the working tree is the mistake; you search all reachable (and unreachable) history.",
     apply: [
       "`git log --oneline --all --decorate --graph` to see every branch and where commits diverge.",
       "Search all of history at once: `git grep <pattern> $(git rev-list --all)`.",
@@ -458,9 +458,9 @@ const recipeDetails = {
       "Cloud challenges usually hinge on leaked credentials or over-permissive configuration rather than memory-corruption-style exploits: an access key in a Docker layer or `.tfstate`, a base64 Kubernetes secret, a public bucket, or an audit log (CloudTrail/CloudWatch) that records a privilege-escalation chain. You hunt for secrets, then trace identity and API calls in time order.",
     apply: [
       "Grep broadly for credential shapes: `AKIA`, `SECRET`, `TOKEN`, `private_key`, `BEGIN`, and flag patterns.",
-      "Decode obvious encodings — Kubernetes Secret values and many config blobs are just base64.",
+      "Decode obvious encodings, Kubernetes Secret values and many config blobs are just base64.",
       "For audit logs, project the useful fields with `jq` (time, event, principal ARN, source IP) and sort by time.",
-      "Follow the identity: who created keys, assumed roles, or touched storage — that chain leads to the flag.",
+      "Follow the identity: who created keys, assumed roles, or touched storage, that chain leads to the flag.",
     ],
   },
 };

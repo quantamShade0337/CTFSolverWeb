@@ -734,11 +734,40 @@ export const quickChecks = [
   { label: "Embedded data", command: "binwalk <target> && foremost -i <target> -o carved" },
   { label: "Archive list", command: "7z l <target> || unzip -l <target> || tar tf <target>" },
   { label: "Search folder", command: "grep -RaiE 'flag\\{|picoCTF\\{|password|secret|admin' ." },
+  { label: "Detect encoding", command: "python3 -c \"import base64,pathlib; print(base64.b64decode(pathlib.Path('<target>').read_text().strip()))\"" },
+  { label: "Compare hashes", command: "shasum -a 256 <target> && md5 <target>" },
+  { label: "Find file types", command: "find . -type f -exec file {} \\;" },
+  { label: "Network summary", command: "tshark -r <target> -q -z io,phs" },
 ];
 
 export const installHints = [
   "brew install exiftool binwalk foremost wireshark john hashcat imagemagick zbar",
   "python3 -m pipx install pwntools",
   "python3 -m pip install pillow pycryptodome z3-solver scapy",
-  "brew install tesseract  # optional OCR for visual flags in images",
+  "brew install tesseract  # OCR for visual flags in images",
+  "brew install sevenzip sleuthkit ffmpeg sox",
+  "brew install jadx apktool ghidra",
+];
+
+export const tutorialPaths = [
+  {
+    label: "Start with a mystery file",
+    description: "Identify bytes, scan strings, and uncover a hidden image.",
+    guideId: "binary-digits-image",
+  },
+  {
+    label: "Map a web challenge",
+    description: "Inspect exposed files before testing input handling.",
+    guideId: "source-leak",
+  },
+  {
+    label: "Decode an unknown message",
+    description: "Recognize common encodings and peel back each layer.",
+    guideId: "base-encoding",
+  },
+  {
+    label: "Begin binary exploitation",
+    description: "Check protections and redirect execution to a win function.",
+    guideId: "ret2win",
+  },
 ];

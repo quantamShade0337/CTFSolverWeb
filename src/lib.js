@@ -1,7 +1,13 @@
-import { guides, categories, quickChecks, installHints } from "./data.js";
+import {
+  guides,
+  categories,
+  quickChecks,
+  installHints,
+  tutorialPaths,
+} from "./data.js";
 import { categoryLabels, plainTitles } from "./friendly.js";
 
-export { guides, categories, quickChecks, installHints };
+export { guides, categories, quickChecks, installHints, tutorialPaths };
 
 for (const guide of guides) {
   guide.plain = plainTitles[guide.id] || null;
@@ -20,7 +26,7 @@ const baseMeta = {
   Web: {
     slug: "web",
     tone: "web",
-    hint: "Look around first — links, forms, cookies — then poke the part that trusts your input.",
+    hint: "Look around first at links, forms, and cookies. Then poke the part that trusts your input.",
   },
   Cryptography: {
     slug: "crypto",

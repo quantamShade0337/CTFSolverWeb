@@ -3,7 +3,7 @@ export const categoryLabels = {
     friendly: "Hidden in a file",
     tech: "Forensics",
     plain:
-      "You're given a file — an image, a sound clip, a disk, a memory dump — and something is hidden inside it.",
+      "You're given a file (an image, sound clip, disk, or memory dump) and something is hidden inside it.",
   },
   Web: {
     friendly: "Hacking a website",
@@ -15,7 +15,7 @@ export const categoryLabels = {
     friendly: "Secret codes",
     tech: "Cryptography (crypto)",
     plain:
-      "A message has been scrambled or encrypted — usually with a mistake in how it was done — and your job is to unscramble it.",
+      "A message has been scrambled or encrypted. There is usually a mistake in how it was done, and your job is to unscramble it.",
   },
   "Binary Exploit": {
     friendly: "Breaking a program",
