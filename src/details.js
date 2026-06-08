@@ -1,7 +1,7 @@
 export const guideDetails = {
   "binary-digits-image": {
     explain:
-      "A computer file is just bytes, and a byte is 8 bits. When a challenge hands you a text file containing nothing but `0` and `1`, those characters are a written-out representation of the bits of some real file. Group them into bytes, and the first few bytes (the magic number) tell you what the hidden file actually is — often an image whose flag you have to *see*, not `grep`.",
+      "A computer file is just bytes, and a byte is 8 bits. When a challenge hands you a text file containing nothing but `0` and `1`, those characters are a written-out representation of the bits of some real file. Group them into bytes, and the first few bytes (the magic number) tell you what the hidden file actually is, often an image whose flag you have to *see*, not `grep`.",
     apply: [
       "Confirm it's really just bits: `file` will say ASCII text, and `head` will show only `0`/`1` characters.",
       "Strip whitespace, slice the bit-string into groups of 8, and convert each group to a byte.",
@@ -11,22 +11,22 @@ export const guideDetails = {
   },
   metadata: {
     explain:
-      "Almost every media format carries structured descriptive fields — EXIF on images, document properties on PDFs/Office files, ID3-style tags on audio. Authors love hiding flags in Comment, Author, Artist, GPS, or Software fields because they're invisible in a normal viewer but trivial to read with the right tool.",
+      "Almost every media format carries structured descriptive fields, EXIF on images, document properties on PDFs/Office files, ID3-style tags on audio. Authors love hiding flags in Comment, Author, Artist, GPS, or Software fields because they're invisible in a normal viewer but trivial to read with the right tool.",
     apply: [
       "Run `exiftool <file>` and read every field, not just the obvious ones.",
       "Pay attention to Comment, Artist/Author, GPS, Title, Subject, Software, and CreateDate.",
       "Cross-check with `strings | grep` in case a value is stored outside standard tags.",
-      "If metadata is empty, the platform probably stripped it — move on to appended data or pixel-level stego.",
+      "If metadata is empty, the platform probably stripped it, move on to appended data or pixel-level stego.",
     ],
   },
   "wrong-extension": {
     explain:
-      "Extensions are cosmetic — the operating system and most tools decide a file's type from its leading magic bytes. A challenge that won't open, or that `file` disagrees with, is usually just mislabelled. Identify the true type, then rename a copy.",
+      "Extensions are cosmetic, the operating system and most tools decide a file's type from its leading magic bytes. A challenge that won't open, or that `file` disagrees with, is usually just mislabelled. Identify the true type, then rename a copy.",
     apply: [
       "Run `file` and `xxd -l 32` to see the real signature.",
       "Match the signature to a type (e.g. `PK` = ZIP/Office, `%PDF` = PDF, `Rar!` = RAR).",
       "Copy (don't move) the file to the correct extension, then open it with the matching tool.",
-      "Never patch bytes just because the name looks odd — verify the signature first.",
+      "Never patch bytes just because the name looks odd, verify the signature first.",
     ],
   },
   "corrupt-header": {
@@ -34,14 +34,14 @@ export const guideDetails = {
       "Parsers identify and validate a file by its header. If only the header (the magic bytes) is damaged but the body still contains recognisable chunks like `IHDR`, `JFIF`, or `PK`, repairing the magic bytes restores the parser's ability to read the rest.",
     apply: [
       "Confirm the damage: `file` says `data`, but `xxd`/`grep` finds intact internal markers like `IHDR` or `JFIF`.",
-      "Work on a copy — patching is destructive.",
+      "Work on a copy, patching is destructive.",
       "Overwrite the broken magic with the correct bytes for that format (e.g. the 8-byte PNG signature) using `dd ... conv=notrunc`.",
       "Validate the repair (`pngcheck`, or just open it) and continue triage on the now-readable file.",
     ],
   },
   "appended-archive": {
     explain:
-      "Many formats stop reading at their end-of-file marker and ignore anything after it. That lets an author paste a whole second file (often a ZIP) onto the end of a valid image — the image still opens normally, but a second payload is sitting in the tail. This is the classic polyglot/appended-data trick.",
+      "Many formats stop reading at their end-of-file marker and ignore anything after it. That lets an author paste a whole second file (often a ZIP) onto the end of a valid image, the image still opens normally, but a second payload is sitting in the tail. This is the classic polyglot/appended-data trick.",
     apply: [
       "Run `binwalk <file>` to list embedded file signatures and their offsets.",
       "Locate the embedded magic precisely with `grep -abo` (e.g. the ZIP marker `PK\\x03\\x04`).",
@@ -51,17 +51,17 @@ export const guideDetails = {
   },
   "nested-archives": {
     explain:
-      "Some challenges wrap an archive inside an archive inside an archive — the work is the recursion itself. Each layer may also change format (zip → tar → gz). The trick is to extract methodically and scan after every layer so you don't miss the flag dropped between two of them.",
+      "Some challenges wrap an archive inside an archive inside an archive, the work is the recursion itself. Each layer may also change format (zip → tar → gz). The trick is to extract methodically and scan after every layer so you don't miss the flag dropped between two of them.",
     apply: [
       "Extract one layer into a clean folder and `file` everything that comes out.",
       "Repeat for each new archive you find, tracking depth so you don't loop.",
-      "`grep -R` for the flag after each extraction — it might appear before the final layer.",
+      "`grep -R` for the flag after each extraction, it might appear before the final layer.",
       "Be wary of zip bombs: don't run unbounded recursive scripts on suspiciously tiny archives.",
     ],
   },
   "password-archive": {
     explain:
-      "An encrypted archive needs its password. In CTFs the password is usually findable — in the prompt, a filename, a comment, or accompanying metadata — and only meant to be brute-forced when the challenge clearly hints at a weak one. `zip2john`/`john` turn the archive into a crackable hash.",
+      "An encrypted archive needs its password. In CTFs the password is usually findable, in the prompt, a filename, a comment, or accompanying metadata, and only meant to be brute-forced when the challenge clearly hints at a weak one. `zip2john`/`john` turn the archive into a crackable hash.",
     apply: [
       "First hunt for the password in the challenge text, filenames, comments, and any provided files.",
       "If cracking is intended, extract the hash: `zip2john locked.zip > zip.hash`.",
@@ -71,12 +71,12 @@ export const guideDetails = {
   },
   "lsb-image": {
     explain:
-      "In a lossless image, changing the least-significant bit of each colour channel is invisible to the eye but can store a hidden message. LSB stego reads those low bits across the pixels and reassembles them into bytes. It only works on lossless formats — JPEG's compression destroys the low bits.",
+      "In a lossless image, changing the least-significant bit of each colour channel is invisible to the eye but can store a hidden message. LSB stego reads those low bits across the pixels and reassembles them into bytes. It only works on lossless formats, JPEG's compression destroys the low bits.",
     apply: [
-      "Confirm the format is lossless (PNG/BMP); if it's JPEG, this won't work — switch playbooks.",
-      "Try `zsteg image.png` first — it auto-checks many bit/channel combinations.",
+      "Confirm the format is lossless (PNG/BMP); if it's JPEG, this won't work, switch playbooks.",
+      "Try `zsteg image.png` first, it auto-checks many bit/channel combinations.",
       "If that misses, extract the LSB of each channel yourself and assemble the bits into bytes.",
-      "Test channels and bit-planes separately (R, G, B) and different bit orders — the encoding varies.",
+      "Test channels and bit-planes separately (R, G, B) and different bit orders, the encoding varies.",
     ],
   },
   "alpha-channel": {
@@ -85,13 +85,13 @@ export const guideDetails = {
     apply: [
       "Extract the alpha channel: `magick image.png -alpha extract alpha.png`.",
       "Open the extracted channel and inspect it directly.",
-      "Try viewing over both black and white backgrounds — white-on-transparent text hides on light viewers.",
+      "Try viewing over both black and white backgrounds, white-on-transparent text hides on light viewers.",
       "If nothing shows, separate and inspect each individual channel.",
     ],
   },
   "image-difference": {
     explain:
-      "When a challenge gives two nearly identical images, the message is the difference between them. Subtracting one from the other cancels the shared content and leaves only what changed — often hidden text or a watermark.",
+      "When a challenge gives two nearly identical images, the message is the difference between them. Subtracting one from the other cancels the shared content and leaves only what changed, often hidden text or a watermark.",
     apply: [
       "Make sure both images are the same dimensions (resize if `compare` complains).",
       "Composite the difference: `magick a.png b.png -compose difference -composite diff.png`.",
@@ -111,7 +111,7 @@ export const guideDetails = {
   },
   "office-docx": {
     explain:
-      "Modern Office files (`.docx`, `.pptx`, `.xlsx`) are just ZIP archives of XML and media. Flags hide in comments, speaker notes, custom XML, tracked changes, or embedded media — none of which you'd notice opening the file in Word.",
+      "Modern Office files (`.docx`, `.pptx`, `.xlsx`) are just ZIP archives of XML and media. Flags hide in comments, speaker notes, custom XML, tracked changes, or embedded media, none of which you'd notice opening the file in Word.",
     apply: [
       "List the archive (`unzip -l document.docx`) to see its internal structure.",
       "Unzip it and `grep -R` the XML for flags, comments, and hidden text.",
@@ -131,7 +131,7 @@ export const guideDetails = {
   },
   "memory-volatility": {
     explain:
-      "A RAM dump captures everything a machine was doing — processes, command lines, network sockets, and sometimes secrets. Volatility 3 parses the structure, but dumps are large, so you go top-down: OS first, then processes, then the specific artifact the prompt points at.",
+      "A RAM dump captures everything a machine was doing, processes, command lines, network sockets, and sometimes secrets. Volatility 3 parses the structure, but dumps are large, so you go top-down: OS first, then processes, then the specific artifact the prompt points at.",
     apply: [
       "Identify the OS/profile (`windows.info` or `linux.banners`).",
       "List processes (`pslist`) and command lines (`cmdline`).",
@@ -141,12 +141,12 @@ export const guideDetails = {
   },
   "audio-spectrogram": {
     explain:
-      "Sound has a frequency dimension you can't perceive as shapes, but a spectrogram plots frequency over time as an image — and text drawn into that plot becomes readable. Beeps and tones may instead be Morse or DTMF.",
+      "Sound has a frequency dimension you can't perceive as shapes, but a spectrogram plots frequency over time as an image, and text drawn into that plot becomes readable. Beeps and tones may instead be Morse or DTMF.",
     apply: [
       "Generate a spectrogram: `sox sound.wav -n spectrogram -o spectrogram.png`, then open it.",
       "Look for letters/shapes painted across the frequency axis.",
       "If you hear steady tones, decode Morse by ear or DTMF with `multimon-ng`.",
-      "Check metadata too — sometimes the clue is mundane.",
+      "Check metadata too, sometimes the clue is mundane.",
     ],
   },
   "video-frame": {
@@ -171,17 +171,17 @@ export const guideDetails = {
   },
   "sql-injection": {
     explain:
-      "When an app builds a SQL query by concatenating your input, a quote or SQL keyword can change the query's meaning — letting you bypass logins, read other rows, or dump tables. The first probe is a single quote: if it causes an error or a behaviour change, the parameter is injectable.",
+      "When an app builds a SQL query by concatenating your input, a quote or SQL keyword can change the query's meaning, letting you bypass logins, read other rows, or dump tables. The first probe is a single quote: if it causes an error or a behaviour change, the parameter is injectable.",
     apply: [
       "Send a normal request, then the same request with a `'` appended, and compare responses.",
       "If the response changes/errors, confirm the injection and identify the number of columns.",
       "Use `sqlmap -u '<url>' --batch` to automate detection and extraction on the CTF target.",
-      "Dump only the table/row that plausibly holds the flag — don't spray on real systems.",
+      "Dump only the table/row that plausibly holds the flag, don't spray on real systems.",
     ],
   },
   "lfi-path-traversal": {
     explain:
-      "If a parameter like `file=`, `page=`, or `path=` is used to read a file from disk, supplying `../` sequences lets you climb out of the intended directory and read arbitrary files — `/etc/passwd` to prove it, then the flag file.",
+      "If a parameter like `file=`, `page=`, or `path=` is used to read a file from disk, supplying `../` sequences lets you climb out of the intended directory and read arbitrary files, `/etc/passwd` to prove it, then the flag file.",
     apply: [
       "Test the parameter with a known target: `?file=../../../../etc/passwd`.",
       "If filters block raw `../`, try URL-encoding or doubled sequences like `....//`.",
@@ -191,10 +191,10 @@ export const guideDetails = {
   },
   ssti: {
     explain:
-      "If your input is placed into a server-side template and then rendered, you can inject template syntax that the engine evaluates. The canonical test is `{{7*7}}` — if the response contains `49`, the template engine is executing your input, which can escalate to file reads or RCE.",
+      "If your input is placed into a server-side template and then rendered, you can inject template syntax that the engine evaluates. The canonical test is `{{7*7}}`, if the response contains `49`, the template engine is executing your input, which can escalate to file reads or RCE.",
     apply: [
       "Inject `{{7*7}}` (and `${7*7}`, `#{7*7}`) and look for `49` in the response.",
-      "Fingerprint the engine (Jinja, Twig, Freemarker, Handlebars) — payloads differ per engine.",
+      "Fingerprint the engine (Jinja, Twig, Freemarker, Handlebars), payloads differ per engine.",
       "Use engine-specific payloads to read config/files, e.g. `{{config}}` in Jinja.",
       "`tplmap` can automate detection and exploitation once you've confirmed evaluation.",
     ],
@@ -204,9 +204,9 @@ export const guideDetails = {
       "When a web app shells out to a tool (ping, nslookup, convert, git) using your input, shell metacharacters let you append your own command. A different/extra output after `;`, `&&`, or `$(...)` confirms the shell is running what you injected.",
     apply: [
       "Append a separator and a harmless command: `127.0.0.1;id`.",
-      "Try several separators — `;`, `&&`, `|`, and `$(...)` — since filters vary.",
+      "Try several separators, `;`, `&&`, `|`, and `$(...)`, since filters vary.",
       "Once you have execution, read the flag file with a minimal command like `cat /flag.txt`.",
-      "If output is blind, you may need a callback — only on challenge infrastructure that allows it.",
+      "If output is blind, you may need a callback, only on challenge infrastructure that allows it.",
     ],
   },
   "file-upload": {
@@ -214,24 +214,24 @@ export const guideDetails = {
       "Upload features try to restrict what you can store, but checks on extension, MIME type, or magic bytes are often incomplete. If you can land an executable file in a web-served path, you get code execution. The art is satisfying the checks while keeping the payload runnable.",
     apply: [
       "Probe what's validated: extension, `Content-Type`, and leading magic bytes, independently.",
-      "Craft a file that passes the weak check — e.g. PNG magic bytes followed by PHP code, named `.php.png`.",
+      "Craft a file that passes the weak check, e.g. PNG magic bytes followed by PHP code, named `.php.png`.",
       "Find where uploads are stored and request your file to trigger execution.",
       "If uploads don't execute, pivot to path traversal, image-parser bugs, or metadata.",
     ],
   },
   jwt: {
     explain:
-      "A JSON Web Token is three base64url parts — header, payload, signature — joined by dots, and they start with `eyJ`. The payload is readable client-side, so an app that trusts a `role`/`admin` claim is vulnerable if you can forge a valid token: via a weak HMAC secret, the `alg:none` trick, or RS256→HS256 key confusion.",
+      "A JSON Web Token is three base64url parts, header, payload, signature, joined by dots, and they start with `eyJ`. The payload is readable client-side, so an app that trusts a `role`/`admin` claim is vulnerable if you can forge a valid token: via a weak HMAC secret, the `alg:none` trick, or RS256→HS256 key confusion.",
     apply: [
       "Decode the first two parts (base64url) and read the claims.",
       "Spot the authority claim (`admin`, `role`, `user`).",
-      "Try the relevant forge: crack a weak HMAC secret, set `alg` to `none`, or do key confusion — only in CTF context.",
+      "Try the relevant forge: crack a weak HMAC secret, set `alg` to `none`, or do key confusion, only in CTF context.",
       "Replay the forged token and confirm elevated access. Remember: decoding alone isn't exploiting; the signature still matters.",
     ],
   },
   xxe: {
     explain:
-      "XML parsers can resolve external entities — references that pull in external content. If an endpoint accepts XML (or SVG) and resolves entities, you can define one that reads a local file and echoes it back, leaking the flag.",
+      "XML parsers can resolve external entities, references that pull in external content. If an endpoint accepts XML (or SVG) and resolves entities, you can define one that reads a local file and echoes it back, leaking the flag.",
     apply: [
       "Confirm the endpoint parses XML and watch for entity-related errors.",
       "Define a `SYSTEM` entity pointing at a file (`file:///flag.txt`) and reference it in the body.",
@@ -241,37 +241,37 @@ export const guideDetails = {
   },
   ssrf: {
     explain:
-      "Server-Side Request Forgery happens when an app fetches a URL you supply (a webhook, image, link preview, importer). You point it at internal resources the server can reach but you can't — `127.0.0.1`, internal hosts, or cloud metadata endpoints.",
+      "Server-Side Request Forgery happens when an app fetches a URL you supply (a webhook, image, link preview, importer). You point it at internal resources the server can reach but you can't, `127.0.0.1`, internal hosts, or cloud metadata endpoints.",
     apply: [
       "Find the URL-fetching parameter and point it at `http://127.0.0.1/` to confirm internal access.",
       "Enumerate internal services and admin endpoints (`http://localhost/admin`).",
-      "Target the resource that holds the flag (internal API, metadata service) — CTF endpoints only.",
+      "Target the resource that holds the flag (internal API, metadata service), CTF endpoints only.",
       "If filters block the host, try alternate encodings or URL-parser confusion tricks.",
     ],
   },
   idor: {
     explain:
-      "Insecure Direct Object Reference: the app exposes object IDs (numeric, username, UUID) and forgets to check whether *you* are allowed to see them. Changing the ID returns someone else's data — including the flag object.",
+      "Insecure Direct Object Reference: the app exposes object IDs (numeric, username, UUID) and forgets to check whether *you* are allowed to see them. Changing the ID returns someone else's data, including the flag object.",
     apply: [
       "Find a request that references an object by ID and note the pattern.",
       "Change the ID to another value and see if you get a different user's object.",
       "If IDs are sequential, iterate a small range and grep responses for the flag.",
-      "Keep request volume low — rate limits can be part of the challenge.",
+      "Keep request volume low, rate limits can be part of the challenge.",
     ],
   },
   graphql: {
     explain:
-      "GraphQL endpoints expose a typed schema, and introspection lets you query that schema to discover every type and field. From there you can query objects the UI never exposed — and authorization is sometimes enforced per-endpoint but not per-field.",
+      "GraphQL endpoints expose a typed schema, and introspection lets you query that schema to discover every type and field. From there you can query objects the UI never exposed, and authorization is sometimes enforced per-endpoint but not per-field.",
     apply: [
       "Send an introspection query (`{__schema{types{name}}}`) to map the schema.",
       "Identify types/fields that look like flags, users, or admin data.",
       "Query those fields directly, even if the UI never shows them.",
-      "Test whether auth is missing on specific fields — `graphqlmap` can help automate.",
+      "Test whether auth is missing on specific fields, `graphqlmap` can help automate.",
     ],
   },
   "prototype-pollution": {
     explain:
-      "In JavaScript, objects inherit from a shared prototype. If a Node app merges attacker JSON into an object without guarding `__proto__`/`constructor`, you can write properties onto that shared prototype — flipping flags like `isAdmin` globally, or influencing templates and gadget chains.",
+      "In JavaScript, objects inherit from a shared prototype. If a Node app merges attacker JSON into an object without guarding `__proto__`/`constructor`, you can write properties onto that shared prototype, flipping flags like `isAdmin` globally, or influencing templates and gadget chains.",
     apply: [
       "Find an endpoint that merges JSON bodies or query objects into config/user objects.",
       "Send a payload polluting the prototype: `{\"__proto__\":{\"isAdmin\":true}}`.",
@@ -281,7 +281,7 @@ export const guideDetails = {
   },
   "source-leak": {
     explain:
-      "Before exploiting anything, look for leaked source — exposed `.git`, `.env`, backup files, or source maps. Source tells you exact routes, secrets, and the flag's location, turning a blind challenge into a transparent one.",
+      "Before exploiting anything, look for leaked source, exposed `.git`, `.env`, backup files, or source maps. Source tells you exact routes, secrets, and the flag's location, turning a blind challenge into a transparent one.",
     apply: [
       "Curl the usual suspects: `robots.txt`, `.env`, `.git/HEAD`, `.bak`/`~` backups.",
       "If `.git` is exposed, mirror it (`wget -r .../.git/`) and reconstruct the repo.",
@@ -291,7 +291,7 @@ export const guideDetails = {
   },
   "classic-ciphers": {
     explain:
-      "Letters-only ciphertext with a wordplay-ish or historical theme is usually a classical cipher — Caesar/ROT (a fixed shift), Atbash (alphabet reversed), or Vigenère (a keyword shift). These are cheap to brute-force or solve before reaching for modern crypto.",
+      "Letters-only ciphertext with a wordplay-ish or historical theme is usually a classical cipher, Caesar/ROT (a fixed shift), Atbash (alphabet reversed), or Vigenère (a keyword shift). These are cheap to brute-force or solve before reaching for modern crypto.",
     apply: [
       "Try all 26 Caesar shifts and eyeball the output for readable English.",
       "If no shift works, test Atbash and then Vigenère with likely keywords.",
@@ -306,7 +306,7 @@ export const guideDetails = {
       "For single-byte XOR, try all 256 keys and flag the output containing `flag{`/`picoCTF{`.",
       "For repeating-key XOR, estimate the key size, then solve each key byte as its own single-byte problem.",
       "If you know part of the plaintext (e.g. magic bytes), XOR it against the ciphertext to recover key bytes.",
-      "If the result looks compressed/encrypted, you may be one layer too early — re-examine.",
+      "If the result looks compressed/encrypted, you may be one layer too early, re-examine.",
     ],
   },
   "rsa-given-pq": {
@@ -325,23 +325,23 @@ export const guideDetails = {
     apply: [
       "Take the exact e-th root of `c` (e.g. `gmpy2.iroot(c, 3)`).",
       "If the root is exact, convert the integer to bytes for the flag.",
-      "If it isn't exact, `m^e` exceeded `n` — look for a broadcast/CRT (Håstad) setup across multiple moduli.",
+      "If it isn't exact, `m^e` exceeded `n`, look for a broadcast/CRT (Håstad) setup across multiple moduli.",
       "Confirm there's genuinely no padding before assuming this attack applies.",
     ],
   },
   "rsa-shared-prime": {
     explain:
-      "If two RSA moduli were generated with a bad RNG, they may share a prime factor. The GCD of two such moduli is that shared prime — and dividing it out factors both keys instantly, no heavy factoring required.",
+      "If two RSA moduli were generated with a bad RNG, they may share a prime factor. The GCD of two such moduli is that shared prime, and dividing it out factors both keys instantly, no heavy factoring required.",
     apply: [
       "Collect every modulus the challenge provides.",
       "Compute pairwise GCDs across all of them (not just adjacent pairs).",
-      "Any GCD strictly between 1 and n is a shared prime — divide to get both factors.",
+      "Any GCD strictly between 1 and n is a shared prime, divide to get both factors.",
       "With `p` and `q` known, finish as in the standard 'p and q given' attack.",
     ],
   },
   "padding-oracle": {
     explain:
-      "If a server decrypts your ciphertext and reveals — through different errors, timings, or status codes — whether the PKCS#7 padding was valid, that single bit of feedback lets you recover plaintext one byte at a time without the key. It's slow but deterministic.",
+      "If a server decrypts your ciphertext and reveals, through different errors, timings, or status codes, whether the PKCS#7 padding was valid, that single bit of feedback lets you recover plaintext one byte at a time without the key. It's slow but deterministic.",
     apply: [
       "Confirm the oracle: tamper with a ciphertext block and check that 'bad padding' is distinguishable from other errors.",
       "Attack block by block, byte by byte, using the padding feedback to solve each intermediate byte.",
@@ -351,7 +351,7 @@ export const guideDetails = {
   },
   "hash-crack": {
     explain:
-      "A fixed-length hex/base64 string that you're asked to 'reverse' is a hash — you can't invert it, but you can guess inputs, hash them, and compare. Identify the algorithm first so you pick the right cracking mode.",
+      "A fixed-length hex/base64 string that you're asked to 'reverse' is a hash, you can't invert it, but you can guess inputs, hash them, and compare. Identify the algorithm first so you pick the right cracking mode.",
     apply: [
       "Identify the hash type with `hashid`/`hash-identifier`.",
       "Try challenge-specific guesses and small wordlists before the giant ones.",
@@ -366,7 +366,7 @@ export const guideDetails = {
       "Identify the generator and what seeds it (time, PID, a counter).",
       "If time-seeded, brute-force seeds across a plausible window and regenerate the token.",
       "For MT19937, enough consecutive outputs let you reconstruct the internal state and predict the next.",
-      "If it uses `secrets`/`os.urandom`, this won't work — it's cryptographically secure.",
+      "If it uses `secrets`/`os.urandom`, this won't work, it's cryptographically secure.",
     ],
   },
   ret2win: {
@@ -386,12 +386,12 @@ export const guideDetails = {
       "Send `%p` repeated (or `%N$p`) and find which argument offset leaks your controlled input.",
       "Use leaks to defeat ASLR/canaries by recovering addresses and the stack cookie.",
       "When you need to write, use `%n` with carefully sized output to set memory values.",
-      "Establish the correct argument offset before building any write — it anchors everything.",
+      "Establish the correct argument offset before building any write, it anchors everything.",
     ],
   },
   ret2libc: {
     explain:
-      "With NX enabled you can't run shellcode on the stack, but you can chain existing code. ret2libc redirects execution into libc — leak a libc address to compute its base, then call `system(\"/bin/sh\")` or print the flag.",
+      "With NX enabled you can't run shellcode on the stack, but you can chain existing code. ret2libc redirects execution into libc, leak a libc address to compute its base, then call `system(\"/bin/sh\")` or print the flag.",
     apply: [
       "Find useful gadgets (`pop rdi; ret`) and a function to leak a libc address (e.g. `puts(puts@got)`).",
       "Leak an address, subtract its known offset to compute the libc base.",
@@ -401,12 +401,12 @@ export const guideDetails = {
   },
   "heap-tcache": {
     explain:
-      "Modern glibc caches freed chunks in per-size tcache bins as a singly linked list. A double-free or use-after-free lets you corrupt that list's forward pointer so a future allocation returns an attacker-chosen address — which you point at a hook, GOT entry, or function pointer.",
+      "Modern glibc caches freed chunks in per-size tcache bins as a singly linked list. A double-free or use-after-free lets you corrupt that list's forward pointer so a future allocation returns an attacker-chosen address, which you point at a hook, GOT entry, or function pointer.",
     apply: [
       "Map the menu: what sizes it allocates/frees and where the double-free/UAF is.",
-      "Get a leak (heap and/or libc) — you usually need addresses before poisoning.",
+      "Get a leak (heap and/or libc), you usually need addresses before poisoning.",
       "Poison the tcache fd pointer so the next malloc returns your target address.",
-      "Mind the glibc version — safe-linking (2.32+) changes how the fd pointer is mangled.",
+      "Mind the glibc version, safe-linking (2.32+) changes how the fd pointer is mangled.",
     ],
   },
   "strings-password": {
@@ -431,7 +431,7 @@ export const guideDetails = {
   },
   "android-apk": {
     explain:
-      "An APK is a ZIP of resources plus compiled Dalvik bytecode (and sometimes native `.so` libraries). Decompiling the bytecode back to readable Java/Kotlin reveals validation logic and secrets — but check assets and native libs too, since secrets aren't always in the Java.",
+      "An APK is a ZIP of resources plus compiled Dalvik bytecode (and sometimes native `.so` libraries). Decompiling the bytecode back to readable Java/Kotlin reveals validation logic and secrets, but check assets and native libs too, since secrets aren't always in the Java.",
     apply: [
       "Open it in `jadx` for readable Java/Kotlin; use `apktool` for resources and smali.",
       "Grep the decompiled tree for `flag`, `secret`, `password`, and API keys.",
@@ -446,7 +446,7 @@ export const guideDetails = {
       "Confirm it's PyInstaller (`strings` shows PyInstaller markers).",
       "Extract the bundle with `pyinstxtractor.py`.",
       "Locate the main `.pyc` and decompile it (`uncompyle6`, `decompyle3`, or `pycdc`).",
-      "If decompilation fails, the Python version may mismatch — try a different decompiler.",
+      "If decompilation fails, the Python version may mismatch, try a different decompiler.",
     ],
   },
   wasm: {
@@ -481,12 +481,12 @@ export const guideDetails = {
   },
   "usb-keyboard": {
     explain:
-      "USB HID keyboard traffic carries key-press reports, each containing scancodes (and modifier bits like Shift). Decoding the capdata back into characters reconstructs what was typed — often the flag.",
+      "USB HID keyboard traffic carries key-press reports, each containing scancodes (and modifier bits like Shift). Decoding the capdata back into characters reconstructs what was typed, often the flag.",
     apply: [
       "Extract the HID data: `tshark -r usb.pcap -Y 'usb.capdata' -T fields -e usb.capdata`.",
       "Map each report's scancode to a character, honouring the Shift modifier.",
       "Use a known HID-decode script to turn the byte stream into text.",
-      "If `usb.capdata` is empty, try `usbhid.data` or raw URB bytes — field names vary by capture.",
+      "If `usb.capdata` is empty, try `usbhid.data` or raw URB bytes, field names vary by capture.",
     ],
   },
   "ftp-smtp": {
@@ -504,7 +504,7 @@ export const guideDetails = {
       "Linux auth logs record every login attempt. A brute-force shows as many `Failed password` lines from one IP, eventually followed by an `Accepted password`. The story is: which IP, which account, when it succeeded, and what happened next.",
     apply: [
       "Count failed attempts per source to find the attacker IP.",
-      "Find the `Accepted password` line — that's the moment of compromise.",
+      "Find the `Accepted password` line, that's the moment of compromise.",
       "Trace post-login activity: `sudo`, `session opened`, executed commands.",
       "Mind timezones when correlating with other logs.",
     ],
@@ -526,16 +526,16 @@ export const guideDetails = {
       "Identify the outermost layer from its alphabet (`=` padding → base64, `%7B` → URL, long hex → hex).",
       "Decode exactly one layer.",
       "Inspect the output and repeat if it looks encoded again.",
-      "Don't assume base64 just because of `=` — verify each result actually decodes to something sensible.",
+      "Don't assume base64 just because of `=`, verify each result actually decodes to something sensible.",
     ],
   },
   "qr-barcode": {
     explain:
-      "A visible (or distorted) code in an image is meant to be scanned. If a direct decode fails, the image usually needs cleanup — scaling, cropping, contrast, or colour inversion — before a reader can lock onto it.",
+      "A visible (or distorted) code in an image is meant to be scanned. If a direct decode fails, the image usually needs cleanup, scaling, cropping, contrast, or colour inversion, before a reader can lock onto it.",
     apply: [
       "Try a direct decode first: `zbarimg code.png`.",
       "If it fails, upscale with nearest-neighbour, crop tightly to the code, and boost contrast.",
-      "Try inverting colours — some codes are light-on-dark.",
+      "Try inverting colours, some codes are light-on-dark.",
       "Re-run the decoder after each cleanup step.",
     ],
   },
@@ -551,7 +551,7 @@ export const guideDetails = {
   },
   "zero-width": {
     explain:
-      "Zero-width Unicode characters (U+200B, U+200C, U+FEFF, etc.) render as nothing but are real bytes in the file. Authors use them to encode bits or hide delimiters in otherwise-normal text — the giveaway is text whose copied length is larger than it looks.",
+      "Zero-width Unicode characters (U+200B, U+200C, U+FEFF, etc.) render as nothing but are real bytes in the file. Authors use them to encode bits or hide delimiters in otherwise-normal text, the giveaway is text whose copied length is larger than it looks.",
     apply: [
       "Print the code points of every non-ASCII character in the text.",
       "Identify which zero-width variants appear and how many.",
@@ -575,13 +575,13 @@ export const guideDetails = {
     apply: [
       "View raw control characters with `cat -v`.",
       "Strip the escape sequences with a sed regex to see the underlying text.",
-      "Compare stripped vs rendered output — hidden/overwritten text shows up.",
+      "Compare stripped vs rendered output, hidden/overwritten text shows up.",
       "Grep the cleaned text for the flag.",
     ],
   },
   protobuf: {
     explain:
-      "Protocol Buffers is a compact binary serialization format with no self-describing field names — just numbered fields and wire types (lots of varints). `protoc --decode_raw` parses the structure without needing the `.proto` schema.",
+      "Protocol Buffers is a compact binary serialization format with no self-describing field names, just numbered fields and wire types (lots of varints). `protoc --decode_raw` parses the structure without needing the `.proto` schema.",
     apply: [
       "Recognise it: small numbered fields, repeated varint-like structure in the hex.",
       "Decode without a schema: `protoc --decode_raw < message.bin`.",
@@ -631,7 +631,7 @@ export const guideDetails = {
   },
   "ntfs-ads": {
     explain:
-      "NTFS files can carry named Alternate Data Streams — extra hidden streams attached to a file that don't show in normal directory listings. Forensic tools can enumerate and extract them.",
+      "NTFS files can carry named Alternate Data Streams, extra hidden streams attached to a file that don't show in normal directory listings. Forensic tools can enumerate and extract them.",
     apply: [
       "Enumerate files and their streams with `fls -r` on the NTFS image.",
       "Extract a named stream by inode with `icat 'image' '<inode>:<stream>'`.",
@@ -641,7 +641,7 @@ export const guideDetails = {
   },
   "sqlite-deleted": {
     explain:
-      "SQLite doesn't always zero out deleted rows — the old data can linger in freed pages. Beyond normal queries, `.recover` and raw `strings` can surface deleted records.",
+      "SQLite doesn't always zero out deleted rows, the old data can linger in freed pages. Beyond normal queries, `.recover` and raw `strings` can surface deleted records.",
     apply: [
       "Inspect the schema: `sqlite3 app.db '.tables'` and `sqlite_master`.",
       "Query the live tables for obvious data.",
@@ -671,7 +671,7 @@ export const guideDetails = {
   },
   cors: {
     explain:
-      "A misconfigured CORS policy that reflects an arbitrary `Origin` and allows credentials lets a malicious site read authenticated responses cross-origin — leaking protected data.",
+      "A misconfigured CORS policy that reflects an arbitrary `Origin` and allows credentials lets a malicious site read authenticated responses cross-origin, leaking protected data.",
     apply: [
       "Send a request with a crafted `Origin` header and inspect the response CORS headers.",
       "Check whether `Access-Control-Allow-Origin` reflects your origin and `Allow-Credentials` is true.",
@@ -681,7 +681,7 @@ export const guideDetails = {
   },
   nosql: {
     explain:
-      "NoSQL backends like MongoDB accept query operators. If an app passes unsanitised JSON into a query, operators like `$ne` or `$regex` change the query's logic — e.g. matching any user/password to bypass login.",
+      "NoSQL backends like MongoDB accept query operators. If an app passes unsanitised JSON into a query, operators like `$ne` or `$regex` change the query's logic, e.g. matching any user/password to bypass login.",
     apply: [
       "Confirm the endpoint takes JSON and likely talks to MongoDB.",
       "Send operator payloads such as `{\"user\":{\"$ne\":null},\"pass\":{\"$ne\":null}}`.",
@@ -701,7 +701,7 @@ export const guideDetails = {
   },
   "php-type-juggling": {
     explain:
-      "PHP's loose comparison (`==`) coerces types, so strings like `'0e123'` are treated as the number 0 — making different 'magic hash' strings compare as equal. Code that compares hashes/tokens with `==` is vulnerable.",
+      "PHP's loose comparison (`==`) coerces types, so strings like `'0e123'` are treated as the number 0, making different 'magic hash' strings compare as equal. Code that compares hashes/tokens with `==` is vulnerable.",
     apply: [
       "Find a loose comparison (`==`) on a hash or token in the source.",
       "Supply a value that juggles to match (e.g. a `0e...` magic hash that hashes to `0e...`).",
@@ -711,7 +711,7 @@ export const guideDetails = {
   },
   "request-smuggling": {
     explain:
-      "When a front-end proxy and back-end server disagree about where one HTTP request ends (conflicting `Content-Length` vs `Transfer-Encoding`), you can smuggle a second request past the proxy — poisoning other users' requests or reaching internal routes.",
+      "When a front-end proxy and back-end server disagree about where one HTTP request ends (conflicting `Content-Length` vs `Transfer-Encoding`), you can smuggle a second request past the proxy, poisoning other users' requests or reaching internal routes.",
     apply: [
       "Probe for CL.TE / TE.CL desync between the front-end and back-end.",
       "Use a tool like `smuggler.py` to detect the disagreement.",
@@ -721,7 +721,7 @@ export const guideDetails = {
   },
   "oauth-redirect": {
     explain:
-      "OAuth flows hand tokens to a `redirect_uri`. If the server validates that URI loosely, you can redirect the token to a server you control — via subdomain confusion, path tricks, or an open redirect — and steal the authorization.",
+      "OAuth flows hand tokens to a `redirect_uri`. If the server validates that URI loosely, you can redirect the token to a server you control, via subdomain confusion, path tricks, or an open redirect, and steal the authorization.",
     apply: [
       "Inspect the login flow for `redirect_uri` and `state` parameters.",
       "Test redirect bypasses: attacker domain, subdomain confusion, path traversal, open redirect.",
@@ -733,7 +733,7 @@ export const guideDetails = {
     explain:
       "ECB mode encrypts each 16-byte block independently, so identical plaintext blocks produce identical ciphertext blocks. That repetition leaks structure (the famous 'ECB penguin') and enables byte-at-a-time decryption when you can prepend chosen plaintext.",
     apply: [
-      "Split the ciphertext into 16-byte blocks and count repeats — repeats confirm ECB.",
+      "Split the ciphertext into 16-byte blocks and count repeats, repeats confirm ECB.",
       "If you control prepended input, align secret bytes to block boundaries and recover them one at a time.",
       "Compare blocks across inputs to map structure.",
       "Reconstruct the secret from the recovered blocks.",
@@ -741,7 +741,7 @@ export const guideDetails = {
   },
   "cbc-bitflip": {
     explain:
-      "In CBC, each plaintext block is XORed with the previous ciphertext block during decryption. Flipping a bit in ciphertext block N flips the corresponding bit in plaintext block N+1 (while garbling block N) — letting you forge controlled plaintext like `admin=true`.",
+      "In CBC, each plaintext block is XORed with the previous ciphertext block during decryption. Flipping a bit in ciphertext block N flips the corresponding bit in plaintext block N+1 (while garbling block N), letting you forge controlled plaintext like `admin=true`.",
     apply: [
       "Identify the structured field you want to change and which plaintext block it lands in.",
       "Compute the XOR difference between current and desired bytes.",
@@ -761,7 +761,7 @@ export const guideDetails = {
   },
   "length-extension": {
     explain:
-      "Merkle–Damgård hashes (MD5, SHA-1, SHA-256) let you continue hashing from a known digest. If a MAC is built as `hash(secret || message)`, you can append data and compute a valid MAC for the extended message without knowing the secret.",
+      "Merkle Damgård hashes (MD5, SHA-1, SHA-256) let you continue hashing from a known digest. If a MAC is built as `hash(secret || message)`, you can append data and compute a valid MAC for the extended message without knowing the secret.",
     apply: [
       "Recognise the vulnerable construction: `hash(secret || message)` used as a MAC.",
       "Estimate the secret length (or brute-force it).",
@@ -771,7 +771,7 @@ export const guideDetails = {
   },
   "ecdsa-nonce": {
     explain:
-      "ECDSA signatures use a per-signature random nonce `k`. If two signatures reuse the same `k`, they share the same `r` value — and the math then directly recovers `k` and the long-term private key.",
+      "ECDSA signatures use a per-signature random nonce `k`. If two signatures reuse the same `k`, they share the same `r` value, and the math then directly recovers `k` and the long-term private key.",
     apply: [
       "Scan the signatures for a repeated `r` value (the reuse tell).",
       "Compute `k = (h1 - h2) / (s1 - s2) mod n` from the two signatures.",
@@ -791,7 +791,7 @@ export const guideDetails = {
   },
   srop: {
     explain:
-      "Sigreturn-Oriented Programming abuses the `sigreturn` syscall, which restores all registers from a frame on the stack. If you can call `sigreturn` and control the stack, you set every register at once — powerful when normal ROP gadgets are scarce.",
+      "Sigreturn-Oriented Programming abuses the `sigreturn` syscall, which restores all registers from a frame on the stack. If you can call `sigreturn` and control the stack, you set every register at once, powerful when normal ROP gadgets are scarce.",
     apply: [
       "Find a `syscall`/`sigreturn` gadget in the binary.",
       "Build a fake signal frame (pwntools `SigreturnFrame`) with the register values you want.",
@@ -821,7 +821,7 @@ export const guideDetails = {
   },
   seccomp: {
     explain:
-      "A seccomp filter restricts which syscalls a process may make — often blocking `execve` so you can't just pop a shell. The workaround is an open-read-write (ORW) ROP chain that opens the flag file, reads it, and writes it to stdout.",
+      "A seccomp filter restricts which syscalls a process may make, often blocking `execve` so you can't just pop a shell. The workaround is an open-read-write (ORW) ROP chain that opens the flag file, reads it, and writes it to stdout.",
     apply: [
       "Dump the filter with `seccomp-tools dump ./vuln` to see what's allowed.",
       "If `execve` is blocked but `open`/`read`/`write` aren't, plan an ORW chain.",
@@ -831,12 +831,12 @@ export const guideDetails = {
   },
   "angr-constraints": {
     explain:
-      "When a checker is pure logic — lots of arithmetic/bitwise constraints on the input — symbolic execution can solve it for you. angr explores paths with a symbolic input and asks a solver (Z3) for input that reaches the 'success' state.",
+      "When a checker is pure logic, lots of arithmetic/bitwise constraints on the input, symbolic execution can solve it for you. angr explores paths with a symbolic input and asks a solver (Z3) for input that reaches the 'success' state.",
     apply: [
       "Model stdin/argv as a symbolic value of the right length.",
       "Identify the address of the success branch (and the failure addresses to avoid).",
       "Run angr's explorer to find a path to success.",
-      "Read the concretised input the solver produces — that's the flag/password.",
+      "Read the concretised input the solver produces, that's the flag/password.",
     ],
   },
   "upx-packed": {
@@ -885,13 +885,13 @@ export const guideDetails = {
     apply: [
       "Extract ICMP payloads: `tshark -Y icmp -T fields -e data.data`.",
       "Concatenate them in order and convert from hex.",
-      "Inspect the result — it may be plaintext or a further-encoded blob.",
+      "Inspect the result, it may be plaintext or a further-encoded blob.",
       "Note unusual payload sizes as the tell that data is hidden there.",
     ],
   },
   "tcp-flags": {
     explain:
-      "Covert channels can encode bits in metadata rather than payload — TCP flag combinations, port choices, packet lengths, or inter-packet timing. Patterned-looking flags/timing are the clue.",
+      "Covert channels can encode bits in metadata rather than payload, TCP flag combinations, port choices, packet lengths, or inter-packet timing. Patterned-looking flags/timing are the clue.",
     apply: [
       "Extract the suspect field (e.g. `tcp.flags`, or `frame.time_epoch` for timing).",
       "Map the values to bits per a plausible scheme (flag present = 1, etc.).",
@@ -931,7 +931,7 @@ export const guideDetails = {
   },
   "cron-persistence": {
     explain:
-      "Attackers use scheduled jobs (cron) for persistence — a recurring command that re-establishes access or rewrites the flag. Cron files and syslog CRON entries reveal these jobs.",
+      "Attackers use scheduled jobs (cron) for persistence, a recurring command that re-establishes access or rewrites the flag. Cron files and syslog CRON entries reveal these jobs.",
     apply: [
       "Search cron locations for suspicious commands: `grep -RniE 'curl|wget|bash|sh' /etc/cron*` and user crontabs.",
       "Check `/var/log/syslog` for `CRON` execution entries.",
@@ -941,7 +941,7 @@ export const guideDetails = {
   },
   cloudtrail: {
     explain:
-      "AWS CloudTrail logs every API call as JSON — who did what, when, and from where. A compromise shows as a sequence: credential creation, role assumption, then access to storage. You order events by time and follow the principal.",
+      "AWS CloudTrail logs every API call as JSON, who did what, when, and from where. A compromise shows as a sequence: credential creation, role assumption, then access to storage. You order events by time and follow the principal.",
     apply: [
       "Flatten the events with `jq` (time, event name, principal ARN, source IP).",
       "Grep for escalation/exfil events: `CreateAccessKey`, `AssumeRole`, `GetObject`, `PutBucket`.",

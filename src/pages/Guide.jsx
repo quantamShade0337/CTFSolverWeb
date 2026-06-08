@@ -1,7 +1,10 @@
+import { useId, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   AlertTriangle,
+  BookOpen,
   Check,
+  ChevronDown,
   ChevronRight,
   Copy,
   Lightbulb,
@@ -19,6 +22,7 @@ import {
   installHints,
   quickChecks,
   relatedGuides,
+  tutorialPaths,
 } from "../lib.js";
 import { NotFound } from "./NotFound.jsx";
 
@@ -26,6 +30,32 @@ function fmt(text) {
   return text
     .split(/`([^`]+)`/g)
     .map((seg, i) => (i % 2 ? <code key={i}>{seg}</code> : seg));
+}
+
+function RailCard({ title, icon, children, defaultOpen = true }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const contentId = useId();
+
+  return (
+    <section className="rail-card" data-open={open ? "true" : "false"}>
+      <button
+        type="button"
+        className="rail-toggle"
+        aria-expanded={open}
+        aria-controls={contentId}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span className="rail-toggle-title">
+          {icon}
+          {title}
+        </span>
+        <ChevronDown className="rail-toggle-chevron" size={15} />
+      </button>
+      <div className="rail-card-content" id={contentId} hidden={!open}>
+        {children}
+      </div>
+    </section>
+  );
 }
 
 export function Guide() {
@@ -59,8 +89,8 @@ export function Guide() {
             <h1>{displayTitle(guide)}</h1>
             {guide.plain && (
               <p className="guide-tech">
-                The proper name for this is <strong>{guide.title}</strong> — handy
-                to know when you're searching for more.
+                The proper name for this is <strong>{guide.title}</strong>. It is
+                handy to know when you're searching for more.
               </p>
             )}
             <p className="guide-symptom">
@@ -172,8 +202,7 @@ export function Guide() {
 
         <aside className="guide-rail">
           {related.length > 0 && (
-            <div className="rail-card">
-              <h3>More like this</h3>
+            <RailCard title="More like this">
               <div className="rail-links">
                 {related.map((g) => (
                   <Link key={g.id} to={`/guide/${g.id}`} className="rail-link">
@@ -185,13 +214,14 @@ export function Guide() {
               <Link to={`/category/${meta.slug}`} className="rail-all">
                 All {meta.friendly.toLowerCase()} playbooks
               </Link>
-            </div>
+            </RailCard>
           )}
 
-          <div className="rail-card">
-            <h3>
-              <ListChecks size={14} /> First things to try
-            </h3>
+          <RailCard
+            title="First things to try"
+            icon={<ListChecks size={14} />}
+            defaultOpen={false}
+          >
             <div className="rail-copies">
               {quickChecks.map((check, i) => (
                 <button
@@ -199,18 +229,43 @@ export function Guide() {
                   type="button"
                   className="rail-copy"
                   onClick={() => copy(check.command, `qc-${i}`)}
+                  data-copied={copied === `qc-${i}` ? "true" : "false"}
+                  title={check.command}
                 >
                   <span>{check.label}</span>
                   {copied === `qc-${i}` ? <Check size={14} /> : <Copy size={14} />}
                 </button>
               ))}
             </div>
-          </div>
+          </RailCard>
 
-          <div className="rail-card">
-            <h3>
-              <Package size={14} /> Install the toolkit
-            </h3>
+          <RailCard
+            title="Guided tutorials"
+            icon={<BookOpen size={14} />}
+            defaultOpen={false}
+          >
+            <div className="rail-tutorials">
+              {tutorialPaths.map((tutorial) => (
+                <Link
+                  key={tutorial.guideId}
+                  to={`/guide/${tutorial.guideId}`}
+                  className="rail-tutorial"
+                >
+                  <span>
+                    <strong>{tutorial.label}</strong>
+                    <small>{tutorial.description}</small>
+                  </span>
+                  <ChevronRight size={14} />
+                </Link>
+              ))}
+            </div>
+          </RailCard>
+
+          <RailCard
+            title="Install the toolkit"
+            icon={<Package size={14} />}
+            defaultOpen={false}
+          >
             <div className="rail-copies">
               {installHints.map((hint, i) => (
                 <button
@@ -225,7 +280,7 @@ export function Guide() {
                 </button>
               ))}
             </div>
-          </div>
+          </RailCard>
         </aside>
       </div>
     </div>

@@ -68,7 +68,7 @@ export function SearchBar({ variant = "hero", autoFocus = false, initial = "" })
           aria-autocomplete="list"
           placeholder={
             variant === "hero"
-              ? "Describe what you're stuck on — a file, a symptom, a tool…"
+              ? "Describe what you're stuck on: a file, a symptom, a tool…"
               : "Search playbooks"
           }
           onChange={(e) => {

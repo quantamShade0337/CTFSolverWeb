@@ -40,8 +40,8 @@ export function Home() {
           </h1>
           <p className="hero-sub">
             New to Capture The Flag? This is a plain-English field guide. Tell it
-            what you're looking at — a weird file, an odd message, a website — and
-            it gives you the commands to run, the order to run them in, and the
+            what you're looking at, such as a weird file, an odd message, or a website.
+            It gives you the commands to run, the order to run them in, and the
             mistakes to skip.
           </p>
 
@@ -70,7 +70,7 @@ export function Home() {
                 <Flag size={15} /> What's a "flag"?
               </h3>
               <p>
-                Every challenge hides a secret string — the <em>flag</em> — that
+                Every challenge hides a secret string, the <em>flag</em>, that
                 proves you solved it. It usually looks like{" "}
                 <code>flag{"{"}...{"}"}</code> or <code>picoCTF{"{"}...{"}"}</code>.
                 Find it, paste it in, score points.
@@ -83,7 +83,7 @@ export function Home() {
               <p>
                 Figure out which <em>kind</em> of challenge you have (the cards
                 below describe each one in plain words). Open its playbook and work
-                top to bottom — read what each command prints before the next.
+                top to bottom. Read what each command prints before the next.
               </p>
             </div>
             <div className="primer-card">
@@ -105,7 +105,7 @@ export function Home() {
           <h2>What kind of challenge is it?</h2>
           <p>
             Eight kinds, each in plain English. Not sure? The one-liners below tell
-            you what each one feels like. The proper name is in small text — you'll
+            you what each one feels like. The proper name is in small text. You'll
             pick those up as you go.
           </p>
         </div>

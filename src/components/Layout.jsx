@@ -61,7 +61,7 @@ export function Layout() {
           <p className="footer-note">
             {totalGuides} step-by-step playbooks across {categories.length} kinds of
             challenge. Made for people who are new to CTFs and just want to know
-            what to try next — in plain English.
+            what to try next, in plain English.
           </p>
           <nav className="footer-cats" aria-label="All categories">
             {categories.map((c) => (
